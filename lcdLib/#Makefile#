@@ -6,7 +6,7 @@ CC              = msp430-elf-gcc
 AS              = msp430-elf-as
 AR              = msp430-elf-ar
 
-all: libLcd.a main.elf
+all: main.elf
 
 libLcd.a: font-11x16.o font-5x7.o font-8x12.o lcdutils.o lcddraw.o
 	$(AR) crs $@ $^
@@ -14,12 +14,6 @@ libLcd.a: font-11x16.o font-5x7.o font-8x12.o lcdutils.o lcddraw.o
 lcddraw.o: lcddraw.c lcddraw.h lcdutils.h
 lcdutils.o: lcdutils.c lcdutils.h
 main.o: main.c
-
-install: libLcd.a
-	mkdir -p ../h ../lib
-	mv $^ ../lib
-	cp *.h ../h
-
 clean:
 	rm -f libLcd.a *.o *.elf
 
@@ -27,7 +21,7 @@ lcddemo.elf: lcddemo.o libLcd.a
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@ -lTimer
 
 main.elf: main.o lcdutils.o lcddraw.o libLcd.a
-	${CC} ${CFLAGS} ${LDFLAGS} -o $@ $^ -lTimer
+	${CC} ${CFLAGS} ${LDFLAGS} $@ $^ -lTimer
 
 load: main.elf
 	msp430loader.sh $^

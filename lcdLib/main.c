@@ -1,6 +1,7 @@
 #include <msp430.h>
 #include "libTimer.h"
 #include "lcdutils.h"
+#include "lcddraw.h"
 
 #define SWITCHES ( BIT0 | BIT1 | BIT2 | BIT3 )
 #define LED BIT6
