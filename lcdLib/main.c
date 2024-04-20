@@ -3,12 +3,12 @@
 #include "lcdutils.h"
 #include "lcddraw.h"
 
-#define SWITCHES ( BIT0 | BIT1 | BIT2 | BIT3 )
 #define LED BIT6
+//#define SWITCHES ( BIT0 | BIT1 | BIT2 | BIT3 )
+#define SWITCHES 15
 
-int colors[4] = {COLOR_PINK, COLOR_PURPLE, COLOR_RED, COLOR_WHITE};
+unsigned short colors[4] = {COLOR_PINK, COLOR_PURPLE, COLOR_RED, COLOR_WHITE};
 int colorIndex = 0;
-
 int redrawScreen = 1;
 
 static char switch_update_interrupt_sense()
@@ -34,10 +34,12 @@ int switches = 0;
 
 void switch_interrupt_handler()
 {
+  P1OUT ^= LED;
 
   colorIndex = (colorIndex + 1) % 4;
   redrawScreen = 1;
-  
+
+  P2IFG &= ~SWITCHES;
   /*
   char p2val = switch_update_interrupt_sense();
   switches = ~p2val & SWITCHES;
@@ -54,7 +56,7 @@ void switch_interrupt_handler()
 void main()
 {
   P1DIR |= LED;
-  P1OUT |= LED;
+  P1OUT &= ~LED;
   
   WDTCTL = WDTPW | WDTHOLD;
   configureClocks();
@@ -62,25 +64,21 @@ void main()
   switch_init();
   
   enableWDTInterrupts();
-  or_sr(0x8);
-
-  clearScreen(COLOR_BLACK);
+  or_sr(0x18);
 
   while(1) {
+    
     if (redrawScreen) {
       redrawScreen = 0;
       clearScreen(colors[colorIndex]);
     }
-    P1OUT &= ~LED;
-    or_sr(0x10);
-    P1OUT |= LED;
   }
 }
 
 void __interrupt_vec(PORT2_VECTOR) PORT_2()
 {
   if (P2IFG & SWITCHES){
-    P2IFG &= ~SWITCHES;
+    //P2IFG &= ~SWITCHES;
     switch_interrupt_handler();
   }
 }
