@@ -117,7 +117,15 @@ void draw_heart(int col, int row, int size, unsigned short color)
 
 void draw_ambulance()
 {
-  
+  fillRectangle(0, centerRow + 20, width, 100, COLOR_GREEN); // Grass
+  fillRectangle(centerCol - 30, centerRow + 18, 60, 100, COLOR_GRAY); //Road
+
+  //Ambulance
+  fillRectangle(centerCol - 20, centerRow + 5, 40, 30, COLOR_WHITE); //BottomBodyPart
+  fillRectangle(centerCol - 15, centerRow - 5, 30, 10, COLOR_WHITE); //TopBodyPart
+  fillRectangle(centerCol - 10, centerRow - 3, 20, 9, COLOR_BLUE);
+  fillRectangle(centerCol - 25, centerRow + 30, 6, 8, COLOR_BLACK);
+  fillRectangle(centerCol + 19, centerRow + 30, 6, 8, COLOR_BLACK);
 }
 
 
@@ -186,7 +194,21 @@ void main()
   while (1) {			/* forever */
     if (redrawScreen) {
       redrawScreen = 0;
-      update_shape();
+
+      switch(state){
+      case 0:
+
+	update_shape();
+	break;
+	
+      case 1:
+
+	draw_ambulance();
+	break;
+	
+      default:
+	break;
+      }
     }
     P1OUT &= ~LED;	/* led off */
     or_sr(0x10);	/**< CPU OFF */
