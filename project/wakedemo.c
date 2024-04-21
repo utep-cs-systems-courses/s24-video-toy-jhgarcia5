@@ -50,6 +50,7 @@ switch_init()			/* setup switch */
 }
 
 int switches = 0;
+int state = 0;
 
 void
 switch_interrupt_handler()
@@ -59,17 +60,23 @@ switch_interrupt_handler()
 
   if (switches & SW1){
     size += 1;
+    state = 0;
   }
 
   if (switches & SW2) {
     if(size != 1){
       size -= 1;
+      state = 0;
     }
   }
 
   if(switches & SW3) {
     colorIndex = (colorIndex + 1) % 4;
     state = 0;
+  }
+
+  if (switches & SW4) {
+    state = 1;
   }
 
   redrawScreen = 1;
@@ -106,6 +113,11 @@ void draw_heart(int col, int row, int size, unsigned short color)
     drawPixel(centerCol + i - size, centerRow + i, color);
       //}
   }
+}
+
+void draw_ambulance()
+{
+  
 }
 
 
