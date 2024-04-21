@@ -26,6 +26,9 @@ short centerRow = screenHeight >> 1;
 
 short redrawScreen = 1;
 
+unsigned short colors[4] = {COLOR_PINK, COLOR_PURPLE, COLOR_RED, COLOR_MAGENTA};
+int colorIndex = 0;
+
 static char 
 switch_update_interrupt_sense()
 {
@@ -62,6 +65,11 @@ switch_interrupt_handler()
     if(size != 1){
       size -= 1;
     }
+  }
+
+  if(switches & SW3) {
+    colorIndex = (colorIndex + 1) % 4;
+    state = 0;
   }
 
   redrawScreen = 1;
@@ -203,7 +211,8 @@ screen_update_hourglass()
 void
 update_shape()
 {
-  draw_heart(centerCol, centerRow, size, COLOR_RED);
+  draw_heart(centerCol, centerRow, size + 1, COLOR_BLUE);
+  draw_heart(centerCol, centerRow, size, colors[colorIndex]);
   //screen_update_ball();
   // screen_update_hourglass();
 }
