@@ -17,6 +17,15 @@
 char blue = 31, green = 0, red = 31;
 unsigned char step = 0;
 
+int size = 10;
+u_char width = screenWidth;
+u_char height = screenHeight;
+
+short centerCol = screenWidth >> 1;
+short centerRow = screenHeight >> 1;
+
+short redrawScreen = 1;
+
 static char 
 switch_update_interrupt_sense()
 {
@@ -44,6 +53,19 @@ switch_interrupt_handler()
 {
   char p2val = switch_update_interrupt_sense();
   switches = ~p2val & SWITCHES;
+
+  if (switches & SW1){
+    size += 1;
+  }
+
+  if (switches & SW2) {
+    if(size != 1){
+      size -= 1;
+    }
+  }
+
+  redrawScreen = 1;
+  
 }
 
 
@@ -56,6 +78,26 @@ void
 draw_ball(int col, int row, unsigned short color)
 {
   fillRectangle(col-1, row-1, 3, 3, color);
+}
+
+void draw_heart(int col, int row, int size, unsigned short color)
+{
+  for(short i = 0; i < size/2; i++){
+    drawPixel(centerCol + i, centerRow - i, color);
+    drawPixel(centerCol - i, centerRow - i, color);
+  }
+
+  for(short i = 0; i < size/2; i++){
+    drawPixel(centerCol-(size/2)-i, centerRow - (size/2) + i, color);
+    drawPixel(centerCol+(size/2)+i, centerRow - (size/2) + i, color);
+  }
+
+  for (short i = 0; i < size; i++) {
+    //for (short j = 0; j <= i; j++) {
+    drawPixel(centerCol - i + size, centerRow + i, color);
+    drawPixel(centerCol + i - size, centerRow + i, color);
+      //}
+  }
 }
 
 
@@ -73,8 +115,6 @@ screen_update_ball()
   draw_ball(drawPos[0], drawPos[1], COLOR_WHITE); /* draw */
 }
   
-
-short redrawScreen = 1;
 u_int controlFontColor = COLOR_GREEN;
 
 void wdt_c_handler()
@@ -163,8 +203,9 @@ screen_update_hourglass()
 void
 update_shape()
 {
-  screen_update_ball();
-  screen_update_hourglass();
+  draw_heart(centerCol, centerRow, size, COLOR_RED);
+  //screen_update_ball();
+  // screen_update_hourglass();
 }
    
 
