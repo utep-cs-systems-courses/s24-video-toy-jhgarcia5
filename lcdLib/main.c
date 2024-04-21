@@ -7,7 +7,7 @@
 //#define SWITCHES ( BIT0 | BIT1 | BIT2 | BIT3 )
 #define SWITCHES 15
 
-unsigned short colors[4] = {COLOR_PINK, COLOR_PURPLE, COLOR_RED, COLOR_WHITE};
+unsigned short colors[4] = {COLOR_PINK, COLOR_PURPLE, COLOR_RED, COLOR_BLUE};
 int colorIndex = 0;
 int redrawScreen = 1;
 

@@ -29,5 +29,5 @@ lcddemo.elf: lcddemo.o libLcd.a
 main.elf: main.o lcdutils.o lcddraw.o libLcd.a
 	${CC} ${CFLAGS} ${LDFLAGS} -o $@ $^ -lTimer
 
-load: main.elf
+load: lcddemo.elf
 	msp430loader.sh $^

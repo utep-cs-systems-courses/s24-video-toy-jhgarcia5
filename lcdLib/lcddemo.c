@@ -12,14 +12,13 @@ main()
 {
   configureClocks();
   lcd_init();
-  u_char width = screenWidth, height = screenHeight;
-
-  clearScreen(COLOR_MAGENTA);
-
+  
+  u_char width = screenWidth, height = screenHeight;  
   // drawString5x7(20,20, "hello", COLOR_GREEN, COLOR_RED);
 
   //fillRectangle(30,30, 60, 60, COLOR_ORANGE);
 
+  
   short centerCol = screenWidth >> 1;
   short centerRow = screenHeight >> 1;
 
@@ -42,10 +41,7 @@ main()
   for (short i = 0; i < size; i++){
     drawPixel(centerCol - size + i, centerRow + i, COLOR_PINK);
     drawPixel(centerCol + size - i, centerRow + i, COLOR_PINK);
-  }
-
-  
-  
+  }  
   /*
   int x = 0;
   int y = 0;
@@ -61,6 +57,4 @@ main()
   }
 
   */
-  
-  
 }
