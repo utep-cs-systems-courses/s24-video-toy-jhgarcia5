@@ -81,23 +81,27 @@ switch_interrupt_handler()
   if (switches & SW1){
     size += 1;
     state = 0;
+    buzzer_set_period(200);
   }
 
   if (switches & SW2) {
     if(size != 1){
       size -= 1;
       state = 0;
+      buzzer_set_period(300);
     }
   }
 
   if(switches & SW3) {
     heartColorIndex = (heartColorIndex + 1) % 4;
     state = 0;
+    buzzer_set_period(400);
   }
 
   if (switches & SW4) {
     state = 1;
     debounceTimer = 5;
+    song();
   }
 
   redrawScreen = 1;
@@ -172,6 +176,27 @@ void changeBackground(unsigned short color)
   fillRectangle(0, centerRow + 18, 34, 2, color);
   fillRectangle(94, centerRow + 18, 100, 2, color);
 }
+
+void song()
+{
+  float C4 = 261.61;
+  float D4 = 293.66;
+  float E4 = 329.63;
+  float G4 = 392.00;
+  float A4 = 440.00;
+  float B4 = 493.88;
+  float F4 = 349.23;
+  float E5 = 659.26;
+  float C5 = 523.25;
+
+  float song[] = {C4, C4, D4, C4, E4, E4, F4, E4};
+  
+  for (int i = 0; i < 8; i++){
+    buzzer_set_period(song[i]);
+    __delay_cycles(10000000);
+  }
+  buzzer_set_period(0);
+}
   
 void wdt_c_handler()
 {
@@ -189,6 +214,7 @@ void wdt_c_handler()
       }
     }
     secCount = 0;
+    buzzer_set_period(0);
     redrawScreen = 1;
   }
 }
