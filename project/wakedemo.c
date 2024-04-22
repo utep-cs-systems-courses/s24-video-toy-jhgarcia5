@@ -13,10 +13,10 @@
 #define SW4 8
 
 #define SWITCHES 15
-
+/*
 char blue = 31, green = 0, red = 31;
 unsigned char step = 0;
-
+*/
 int size = 10;
 u_char width = screenWidth;
 u_char height = screenHeight;
@@ -85,7 +85,7 @@ switch_interrupt_handler()
 
 
 // axis zero for col, axis 1 for row
-
+/*
 short drawPos[2] = {1,10}, controlPos[2] = {2, 10};
 short colVelocity = 1, colLimits[2] = {1, screenWidth/2};
 
@@ -94,6 +94,7 @@ draw_ball(int col, int row, unsigned short color)
 {
   fillRectangle(col-1, row-1, 3, 3, color);
 }
+*/
 
 void draw_heart(int col, int row, int size, unsigned short color)
 {
@@ -115,6 +116,11 @@ void draw_heart(int col, int row, int size, unsigned short color)
   }
 }
 
+void custom_state()
+{
+  //clearScreen(COLOR_MAGENTA);
+}
+
 void draw_ambulance()
 {
   fillRectangle(0, centerRow + 20, width, 100, COLOR_GREEN); // Grass
@@ -123,11 +129,10 @@ void draw_ambulance()
   //Ambulance
   fillRectangle(centerCol - 20, centerRow + 5, 40, 30, COLOR_WHITE); //BottomBodyPart
   fillRectangle(centerCol - 15, centerRow - 5, 30, 10, COLOR_WHITE); //TopBodyPart
-  fillRectangle(centerCol - 10, centerRow - 3, 20, 9, COLOR_BLUE);
-  fillRectangle(centerCol - 25, centerRow + 30, 6, 8, COLOR_BLACK);
-  fillRectangle(centerCol + 19, centerRow + 30, 6, 8, COLOR_BLACK);
+  fillRectangle(centerCol - 10, centerRow - 3, 20, 9, COLOR_BLUE); //Wind shield
+  fillRectangle(centerCol - 25, centerRow + 30, 8, 10, COLOR_BLACK); //Left wheel
+  fillRectangle(centerCol + 17, centerRow + 30, 8, 10, COLOR_BLACK); //Left right
 }
-
 
 void
 screen_update_ball()
@@ -198,6 +203,7 @@ void main()
       switch(state){
       case 0:
 
+	custom_state();
 	update_shape();
 	break;
 	
@@ -215,7 +221,7 @@ void main()
     P1OUT |= LED;	/* led on */
   }
 }
-
+/*
 void
 screen_update_hourglass()
 {
@@ -239,7 +245,7 @@ screen_update_hourglass()
     }
   }
 }  
-
+*/
 
     
 void
