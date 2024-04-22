@@ -13,10 +13,10 @@
 #define SW4 8
 
 #define SWITCHES 15
-/*
+
 char blue = 31, green = 0, red = 31;
 unsigned char step = 0;
-*/
+
 int size = 10;
 u_char width = screenWidth;
 u_char height = screenHeight;
@@ -26,8 +26,13 @@ short centerRow = screenHeight >> 1;
 
 short redrawScreen = 1;
 
-unsigned short colors[4] = {COLOR_PINK, COLOR_PURPLE, COLOR_RED, COLOR_MAGENTA};
-int colorIndex = 0;
+unsigned short heartColors[4] = {COLOR_PINK, COLOR_PURPLE, COLOR_RED, COLOR_MAGENTA};
+int heartColorIndex = 0;
+
+unsigned short backgroundColors[4] = {COLOR_ORANGE, COLOR_YELLOW, COLOR_BLUE, COLOR_PURPLE};
+int bgColorIndex = 0;
+
+int debounceTimer = 0;
 
 static char 
 switch_update_interrupt_sense()
@@ -71,7 +76,7 @@ switch_interrupt_handler()
   }
 
   if(switches & SW3) {
-    colorIndex = (colorIndex + 1) % 4;
+    heartColorIndex = (heartColorIndex + 1) % 4;
     state = 0;
   }
 
@@ -85,7 +90,7 @@ switch_interrupt_handler()
 
 
 // axis zero for col, axis 1 for row
-/*
+
 short drawPos[2] = {1,10}, controlPos[2] = {2, 10};
 short colVelocity = 1, colLimits[2] = {1, screenWidth/2};
 
@@ -94,7 +99,7 @@ draw_ball(int col, int row, unsigned short color)
 {
   fillRectangle(col-1, row-1, 3, 3, color);
 }
-*/
+
 
 void draw_heart(int col, int row, int size, unsigned short color)
 {
@@ -134,6 +139,11 @@ void draw_ambulance()
   fillRectangle(centerCol + 17, centerRow + 30, 8, 10, COLOR_BLACK); //Left right
 }
 
+void changeBackground(unsigned short color)
+{
+  clearScreen(color);
+}
+
 void
 screen_update_ball()
 {
@@ -153,31 +163,35 @@ u_int controlFontColor = COLOR_GREEN;
 void wdt_c_handler()
 {
   static int secCount = 0;
-
+  
   secCount ++;
   if (secCount >= 25) {		/* 10/sec */
    
-    {				/* move ball */
-      short oldCol = controlPos[0];
-      short newCol = oldCol + colVelocity;
-      if (newCol <= colLimits[0] || newCol >= colLimits[1])
-	colVelocity = -colVelocity;
-      else
-	controlPos[0] = newCol;
+    if (state == 1){
+bgColorIndex += (bgColorIndex + 1) % 4;
+clearScreen(backgroundColors[bgColorIndex]);
     }
+// {				/* move ball */
+//    short oldCol = controlPos[0];
+//    short newCol = oldCol + colVelocity;
+//    if (newCol <= colLimits[0] || newCol >= colLimits[1])
+//	colVelocity = -colVelocity;
+//    else
+//	controlPos[0] = newCol;
+//  }
 
-    {				/* update hourglass */
-      if (switches & SW3) green = (green + 1) % 64;
-      if (switches & SW2) blue = (blue + 2) % 32;
-      if (switches & SW1) red = (red - 3) % 32;
-      if (step <= 30)
-	step ++;
-      else
-	step = 0;
-      secCount = 0;
-    }
-    if (switches & SW4) return;
-    redrawScreen = 1;
+//  {				/* update hourglass */
+//    if (switches & SW3) green = (green + 1) % 64;
+//    if (switches & SW2) blue = (blue + 2) % 32;
+//    if (switches & SW1) red = (red - 3) % 32;
+//     if (step <= 30)
+//	step ++;
+//    else
+//	step = 0;
+  secCount = 0;
+//  }
+//  if (switches & SW4) return;
+  redrawScreen = 1;
   }
 }
   
@@ -209,6 +223,7 @@ void main()
 	
       case 1:
 
+	changeBackground(backgroundColors[bgColorIndex]);
 	draw_ambulance();
 	break;
 	
@@ -221,7 +236,7 @@ void main()
     P1OUT |= LED;	/* led on */
   }
 }
-/*
+
 void
 screen_update_hourglass()
 {
@@ -245,14 +260,14 @@ screen_update_hourglass()
     }
   }
 }  
-*/
+
 
     
 void
 update_shape()
 {
   draw_heart(centerCol, centerRow, size + 1, COLOR_BLUE);
-  draw_heart(centerCol, centerRow, size, colors[colorIndex]);
+  draw_heart(centerCol, centerRow, size, heartColors[heartColorIndex]);
   //screen_update_ball();
   // screen_update_hourglass();
 }
