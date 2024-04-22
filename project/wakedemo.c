@@ -60,6 +60,7 @@ int state = 0;
 void
 switch_interrupt_handler()
 {
+  
   char p2val = switch_update_interrupt_sense();
   switches = ~p2val & SWITCHES;
 
@@ -82,6 +83,7 @@ switch_interrupt_handler()
 
   if (switches & SW4) {
     state = 1;
+    debounceTimer = 5;
   }
 
   redrawScreen = 1;
@@ -141,7 +143,8 @@ void draw_ambulance()
 
 void changeBackground(unsigned short color)
 {
-  clearScreen(color);
+  //clearScreen(color);
+  fillRectangle(0,0,width,centerRow - 20,color);
 }
 
 void
@@ -168,8 +171,8 @@ void wdt_c_handler()
   if (secCount >= 25) {		/* 10/sec */
    
     if (state == 1){
-bgColorIndex += (bgColorIndex + 1) % 4;
-clearScreen(backgroundColors[bgColorIndex]);
+      bgColorIndex += (bgColorIndex + 1) % 4;
+      //clearScreen(backgroundColors[bgColorIndex]);
     }
 // {				/* move ball */
 //    short oldCol = controlPos[0];
@@ -188,10 +191,10 @@ clearScreen(backgroundColors[bgColorIndex]);
 //	step ++;
 //    else
 //	step = 0;
-  secCount = 0;
+    secCount = 0;
 //  }
 //  if (switches & SW4) return;
-  redrawScreen = 1;
+    redrawScreen = 1;
   }
 }
   
@@ -231,6 +234,11 @@ void main()
 	break;
       }
     }
+
+    if (debounceTimer > 0) {
+      debounceTimer -= 1;
+    }
+    
     P1OUT &= ~LED;	/* led off */
     or_sr(0x10);	/**< CPU OFF */
     P1OUT |= LED;	/* led on */
