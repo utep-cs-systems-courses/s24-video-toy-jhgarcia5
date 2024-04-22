@@ -14,9 +14,6 @@
 
 #define SWITCHES 15
 
-char blue = 31, green = 0, red = 31;
-unsigned char step = 0;
-
 int size = 10;
 u_char width = screenWidth;
 u_char height = screenHeight;
@@ -35,6 +32,21 @@ int bgColorIndex = 0;
 int lineStart = screenHeight;
 
 int debounceTimer = 0;
+
+void buzzer_init()
+{
+  timerAUpmode();
+  P2SEL2 &= ~(BIT5 | BIT7);
+  P2SEL &= ~BIT7;
+  P2SEL |= BIT6;
+  P2DIR = BIT6;
+}
+
+void buzzer_set_period(short cycles)
+{
+  CCR0 = cycles;
+  CCR1 = cycles >> 1;
+}
 
 static char 
 switch_update_interrupt_sense()
@@ -91,19 +103,6 @@ switch_interrupt_handler()
   redrawScreen = 1;
   
 }
-
-
-// axis zero for col, axis 1 for row
-
-short drawPos[2] = {1,10}, controlPos[2] = {2, 10};
-short colVelocity = 1, colLimits[2] = {1, screenWidth/2};
-
-void
-draw_ball(int col, int row, unsigned short color)
-{
-  fillRectangle(col-1, row-1, 4, 6, color);
-}
-
 
 void draw_heart(int col, int row, int size, unsigned short color)
 {
@@ -173,23 +172,7 @@ void changeBackground(unsigned short color)
   fillRectangle(0, centerRow + 18, 34, 2, color);
   fillRectangle(94, centerRow + 18, 100, 2, color);
 }
-
-void
-screen_update_ball()
-{
-  for (char axis = 0; axis < 2; axis ++) 
-    if (drawPos[axis] != controlPos[axis]) /* position changed? */
-      goto redraw;
-  return;			/* nothing to do */
- redraw:
-  draw_ball(drawPos[0], drawPos[1], COLOR_BLUE); /* erase */
-  for (char axis = 0; axis < 2; axis ++) 
-    drawPos[axis] = controlPos[axis];
-  draw_ball(drawPos[0], drawPos[1], COLOR_WHITE); /* draw */
-}
   
-u_int controlFontColor = COLOR_GREEN;
-
 void wdt_c_handler()
 {
   static int secCount = 0;
@@ -204,37 +187,8 @@ void wdt_c_handler()
 	update_line();
 	redrawScreen = 1; 
       }
-      /*
-      if (secCount % 20 == 0) {
-	update_line();
-	redrawScreen = 1;
-      }
-      */
-      
-      //bgColorIndex = (bgColorIndex + 1) % 4;
-      //redrawScreen = 1;
-      //clearScreen(backgroundColors[bgColorIndex]);
     }
-// {				/* move ball */
-//    short oldCol = controlPos[0];
-//    short newCol = oldCol + colVelocity;
-//    if (newCol <= colLimits[0] || newCol >= colLimits[1])
-//	colVelocity = -colVelocity;
-//    else
-//	controlPos[0] = newCol;
-//  }
-
-//  {				/* update hourglass */
-//    if (switches & SW3) green = (green + 1) % 64;
-//    if (switches & SW2) blue = (blue + 2) % 32;
-//    if (switches & SW1) red = (red - 3) % 32;
-//     if (step <= 30)
-//	step ++;
-//    else
-//	step = 0;
     secCount = 0;
-//  }
-//  if (switches & SW4) return;
     redrawScreen = 1;
   }
 }
@@ -249,6 +203,7 @@ void main()
   configureClocks();
   lcd_init();
   switch_init();
+  buzzer_init();
   
   enableWDTInterrupts();      /**< enable periodic interrupt */
   or_sr(0x8);	              /**< GIE (enable interrupts) */
@@ -292,40 +247,12 @@ void main()
     P1OUT |= LED;	/* led on */
   }
 }
-
-void
-screen_update_hourglass()
-{
-  static unsigned char row = screenHeight / 2, col = screenWidth / 2;
-  static char lastStep = 0;
-  
-  if (step == 0 || (lastStep > step)) {
-    clearScreen(COLOR_BLUE);
-    lastStep = 0;
-  } else {
-    for (; lastStep <= step; lastStep++) {
-      int startCol = col - lastStep;
-      int endCol = col + lastStep;
-      int width = 1 + endCol - startCol;
-      
-      // a color in this BGR encoding is BBBB BGGG GGGR RRRR
-      unsigned int color = (blue << 11) | (green << 5) | red;
-      
-      fillRectangle(startCol, row+lastStep, width, 1, color);
-      fillRectangle(startCol, row-lastStep, width, 1, color);
-    }
-  }
-}  
-
-
     
 void
 update_shape()
 {
   draw_heart(centerCol, centerRow, size + 1, COLOR_BLUE);
   draw_heart(centerCol, centerRow, size, heartColors[heartColorIndex]);
-  //screen_update_ball();
-  // screen_update_hourglass();
 }
    
 
