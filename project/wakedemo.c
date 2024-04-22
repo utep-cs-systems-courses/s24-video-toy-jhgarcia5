@@ -128,10 +128,18 @@ void custom_state()
   //clearScreen(COLOR_MAGENTA);
 }
 
+void draw_ground()
+{
+  fillRectangle(0, centerRow + 20, width, 100, COLOR_GREEN); //GRass
+  fillRectangle(centerCol-30, centerRow + 18, 60, 100, COLOR_GRAY); //Road
+}
+
 void draw_ambulance()
 {
-  fillRectangle(0, centerRow + 20, width, 100, COLOR_GREEN); // Grass
-  fillRectangle(centerCol - 30, centerRow + 18, 60, 100, COLOR_GRAY); //Road
+  //fillRectangle(0, centerRow + 20, width, 100, COLOR_GREEN); // Grass
+  //fillRectangle(70, centerRow + 20, width, 100, COLOR_GREEN);
+  
+  //fillRectangle(centerCol - 30, centerRow + 18, 60, 100, COLOR_GRAY); //Road
 
   //Ambulance
   fillRectangle(centerCol - 20, centerRow + 5, 40, 30, COLOR_WHITE); //BottomBodyPart
@@ -144,7 +152,15 @@ void draw_ambulance()
 void changeBackground(unsigned short color)
 {
   //clearScreen(color);
-  fillRectangle(0,0,width,centerRow - 20,color);
+  fillRectangle(0,0,width,centerRow - 5,color); // Above ambulance
+  fillRectangle(0,centerRow - 5, 49, 10, color); // Left side top
+  fillRectangle(79,centerRow - 5,100, 10, color); //Right side top
+
+  fillRectangle(0, centerRow, 45, 18, color); //Left side bottom
+  fillRectangle(83, centerRow, 100, 18, color); //Right side bottom
+
+  fillRectangle(0, centerRow + 18, 34, 2, color);
+  fillRectangle(94, centerRow + 18, 100, 2, color);
 }
 
 void
@@ -168,10 +184,11 @@ void wdt_c_handler()
   static int secCount = 0;
   
   secCount ++;
-  if (secCount >= 25) {		/* 10/sec */
+  if (secCount >= 250) {		/* 10/sec */
    
     if (state == 1){
-      bgColorIndex += (bgColorIndex + 1) % 4;
+      bgColorIndex = (bgColorIndex + 1) % 4;
+      redrawScreen = 1;
       //clearScreen(backgroundColors[bgColorIndex]);
     }
 // {				/* move ball */
@@ -213,19 +230,25 @@ void main()
   or_sr(0x8);	              /**< GIE (enable interrupts) */
   
   clearScreen(COLOR_BLUE);
+  int drawGround = 1;
+  
   while (1) {			/* forever */
     if (redrawScreen) {
       redrawScreen = 0;
 
       switch(state){
       case 0:
-
+	drawGround = 1;
 	custom_state();
 	update_shape();
 	break;
 	
       case 1:
 
+	if (drawGround){
+	    draw_ground();
+	    drawGround = 0;
+	}
 	changeBackground(backgroundColors[bgColorIndex]);
 	draw_ambulance();
 	break;
