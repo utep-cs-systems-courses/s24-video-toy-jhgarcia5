@@ -32,6 +32,8 @@ int heartColorIndex = 0;
 unsigned short backgroundColors[4] = {COLOR_ORANGE, COLOR_YELLOW, COLOR_BLUE, COLOR_PURPLE};
 int bgColorIndex = 0;
 
+int lineStart = screenHeight;
+
 int debounceTimer = 0;
 
 static char 
@@ -116,10 +118,8 @@ void draw_heart(int col, int row, int size, unsigned short color)
   }
 
   for (short i = 0; i < size; i++) {
-    //for (short j = 0; j <= i; j++) {
     drawPixel(centerCol - i + size, centerRow + i, color);
     drawPixel(centerCol + i - size, centerRow + i, color);
-      //}
   }
 }
 
@@ -134,19 +134,30 @@ void draw_ground()
   fillRectangle(centerCol-30, centerRow + 18, 60, 100, COLOR_GRAY); //Road
 }
 
+void draw_line(int y, unsigned short color)
+{
+  fillRectangle(centerCol - 3, y, centerCol + 2, y + 2, color);
+}
+
 void draw_ambulance()
 {
-  //fillRectangle(0, centerRow + 20, width, 100, COLOR_GREEN); // Grass
-  //fillRectangle(70, centerRow + 20, width, 100, COLOR_GREEN);
-  
-  //fillRectangle(centerCol - 30, centerRow + 18, 60, 100, COLOR_GRAY); //Road
-
   //Ambulance
   fillRectangle(centerCol - 20, centerRow + 5, 40, 30, COLOR_WHITE); //BottomBodyPart
   fillRectangle(centerCol - 15, centerRow - 5, 30, 10, COLOR_WHITE); //TopBodyPart
   fillRectangle(centerCol - 10, centerRow - 3, 20, 9, COLOR_BLUE); //Wind shield
   fillRectangle(centerCol - 25, centerRow + 30, 8, 10, COLOR_BLACK); //Left wheel
   fillRectangle(centerCol + 17, centerRow + 30, 8, 10, COLOR_BLACK); //Left right
+}
+
+void update_line()
+{
+  draw_line(lineStart - 2, COLOR_RED);
+  draw_line(lineStart, COLOR_YELLOW);
+  lineStart -= 2;
+  
+  if(lineStart <= centerRow + 30){
+    lineStart = screenHeight;
+  }
 }
 
 void changeBackground(unsigned short color)
@@ -187,8 +198,21 @@ void wdt_c_handler()
   if (secCount >= 250) {		/* 10/sec */
    
     if (state == 1){
-      bgColorIndex = (bgColorIndex + 1) % 4;
-      redrawScreen = 1;
+
+      if (secCount == 250){
+	bgColorIndex = (bgColorIndex + 1) % 4;
+	update_line();
+	redrawScreen = 1; 
+      }
+      /*
+      if (secCount % 20 == 0) {
+	update_line();
+	redrawScreen = 1;
+      }
+      */
+      
+      //bgColorIndex = (bgColorIndex + 1) % 4;
+      //redrawScreen = 1;
       //clearScreen(backgroundColors[bgColorIndex]);
     }
 // {				/* move ball */
@@ -248,6 +272,7 @@ void main()
 	if (drawGround){
 	    draw_ground();
 	    drawGround = 0;
+	    update_line();
 	}
 	changeBackground(backgroundColors[bgColorIndex]);
 	draw_ambulance();
