@@ -101,7 +101,7 @@ short colVelocity = 1, colLimits[2] = {1, screenWidth/2};
 void
 draw_ball(int col, int row, unsigned short color)
 {
-  fillRectangle(col-1, row-1, 3, 3, color);
+  fillRectangle(col-1, row-1, 4, 6, color);
 }
 
 
@@ -136,7 +136,7 @@ void draw_ground()
 
 void draw_line(int y, unsigned short color)
 {
-  fillRectangle(centerCol - 3, y, centerCol + 2, y + 2, color);
+  fillRectangle(centerCol - 4, y, 5, 8, color);
 }
 
 void draw_ambulance()
@@ -151,11 +151,11 @@ void draw_ambulance()
 
 void update_line()
 {
-  draw_line(lineStart - 2, COLOR_RED);
+  draw_line(lineStart + 10, COLOR_GRAY);
   draw_line(lineStart, COLOR_YELLOW);
-  lineStart -= 2;
+  lineStart -= 10;
   
-  if(lineStart <= centerRow + 30){
+  if(lineStart <= centerRow + 27){
     lineStart = screenHeight;
   }
 }
