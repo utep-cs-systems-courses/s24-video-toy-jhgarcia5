@@ -26,7 +26,7 @@ short redrawScreen = 1;
 unsigned short heartColors[4] = {COLOR_PINK, COLOR_PURPLE, COLOR_RED, COLOR_MAGENTA};
 int heartColorIndex = 0;
 
-unsigned short backgroundColors[4] = {COLOR_ORANGE, COLOR_YELLOW, COLOR_BLUE, COLOR_PURPLE};
+unsigned short backgroundColors[5] = {COLOR_ORANGE, COLOR_YELLOW, COLOR_SKY_BLUE, COLOR_BLUE, COLOR_DARK_VIOLE};
 int bgColorIndex = 0;
 
 int lineStart = screenHeight;
@@ -145,9 +145,9 @@ void draw_line(int y, unsigned short color)
 void draw_ambulance()
 {
   //Ambulance
-  fillRectangle(centerCol - 20, centerRow + 5, 40, 30, COLOR_WHITE); //BottomBodyPart
-  fillRectangle(centerCol - 15, centerRow - 5, 30, 10, COLOR_WHITE); //TopBodyPart
-  fillRectangle(centerCol - 10, centerRow - 3, 20, 9, COLOR_BLUE); //Wind shield
+  fillRectangle(centerCol - 20, centerRow + 5, 40, 30, COLOR_HOT_PINK); //BottomBodyPart
+  fillRectangle(centerCol - 15, centerRow - 5, 30, 10, COLOR_HOT_PINK); //TopBodyPart
+  fillRectangle(centerCol - 10, centerRow - 3, 20, 9, COLOR_SKY_BLUE); //Wind shield
   fillRectangle(centerCol - 25, centerRow + 30, 8, 10, COLOR_BLACK); //Left wheel
   fillRectangle(centerCol + 17, centerRow + 30, 8, 10, COLOR_BLACK); //Left right
 }
@@ -208,7 +208,7 @@ void wdt_c_handler()
     if (state == 1){
 
       if (secCount == 250){
-	bgColorIndex = (bgColorIndex + 1) % 4;
+	bgColorIndex = (bgColorIndex + 1) % 5;
 	update_line();
 	redrawScreen = 1; 
       }
